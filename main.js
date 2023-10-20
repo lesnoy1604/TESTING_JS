@@ -26,3 +26,47 @@ btnReset.onclick = function (){
     clearInterval(timerID);
 };
 
+
+
+//const requestURL = 'https://swapi.dev/api/people/1/'
+
+const requestURL = 'http://0.0.0.0:4040/api/v1/users/'
+
+const p = document.getElementById('from-js')
+
+
+
+function sendRequest(method, url, body=null) {
+    const headers ={
+        'Content-Type': 'application/json'
+    }
+    return fetch(url, {
+        method: method,
+        //body: JSON.stringify(body),
+        headers: headers
+    }).then(response => {
+        if (response.ok) {
+            return response.json()
+        } else {
+            return response.json().then(error => {
+                const e = new Error('Что-то пошло не так!')
+                e.data = error
+                throw e
+            })
+        }
+    })
+}
+
+
+sendRequest('GET', requestURL)
+   .then(data => console.log(data))
+   .catch(err => console.log(err))
+
+// const body = {
+//     name: 'Vladilen',
+//     age: 26
+// }
+
+// sendRequest('POST', requestURL, body)
+//     .then(data => console.log(data))
+//     .catch(err => console.log(err))
