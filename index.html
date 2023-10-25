@@ -4,12 +4,12 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>First JS project!</title>
+		<title>WebAuthServ</title>
 		<link rel="stylesheet" href="./style.css" />
 	</head>
 	<body>
 		<header>
-			<h1>First JS project!</h1>
+			<h1>Web Authentication Server</h1>
 			<div class="school-name">Artem Alexeev</div>
 		</header>
 
@@ -19,13 +19,33 @@
             <button role="button" style="width: 120px;" id="start">Старт</button>
             <button role="button" style="width: 120px;" id="pause">Пауза</button>
             <button role="button" style="width: 120px;" id="reset">Сброс</button>
-			<button role="button" style="width: 200px;" id="7">7</button>
 		</div>
 
         <div class="output-status">
-		    <div class="status" style="width: 400px;" id="status">Loading...</div>
+		    <h3>Вход в систему:</h3>
+			<form id="formElem">
+				username:
+				<input type="text" name="username">
+				password:
+				<input type="text" name="password">
+				<input type="submit" style="width: 100px;">
+			</form>
+			<script>
+
+			</script>
+		</div>
+
+		<div class="output-response">
+			<button onclick="f2()" style="width: 200px;" id="btnOutResp"><h3>Load user information</h3></button>
+			<h4 id="statusCode"></h4>
+			<h4><p id="userId"></p></h4>
+			<h4><p id="userLogin"></p></h4>
+			<h4><p id="userName"></p></h4>
+			<h4><p id="userRoleId"></p></h4>
+			<h4><p id="userStatus"></p></h4>
 		</div>
 
 		<script src="./main.js"></script>
 	</body>
 </html>
+
