@@ -118,3 +118,17 @@ h1 {
 	font-weight: 20;
 	margin-right: 10px;
 }
+
+/* Кнопки */
+.output-response{
+	text-align: left;
+}
+
+.btnOutResp{
+	background-color: rgb(9, 192, 79);
+}
+
+.statusCode{
+	color: green;
+	text-align: rigth;
+}
