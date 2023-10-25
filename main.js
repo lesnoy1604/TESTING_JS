@@ -30,43 +30,55 @@ btnReset.onclick = function (){
 
 //const requestURL = 'https://swapi.dev/api/people/1/'
 
-const requestURL = 'http://0.0.0.0:4040/api/v1/users/'
-
-const p = document.getElementById('from-js')
-
-
-
-function sendRequest(method, url, body=null) {
-    const headers ={
-        'Content-Type': 'application/json'
-    }
-    return fetch(url, {
-        method: method,
-        //body: JSON.stringify(body),
-        headers: headers
-    }).then(response => {
-        if (response.ok) {
-            return response.json()
-        } else {
-            return response.json().then(error => {
-                const e = new Error('Что-то пошло не так!')
-                e.data = error
-                throw e
-            })
-        }
-    })
+const requestAuthURL = 'http://0.0.0.0:4040/api/v1/auth/token/'
+const requestUsersURL = 'http://0.0.0.0:4040/api/v1/users/'
+const bearerToken ='Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsInVzZXJpZCI6MSwiYWNjZXNzIjo0Mjk0OTY3Mjk1LCJleHAiOjE2OTgzMTgxMjd9.ueaZT6KMmn07z9xnBHDmg6ycXCfd0HY9MGFjCO-jgb4'
+const bodyInf = {
+    username: 'alfasatcom',
+    password: 'alfasatcom'
 }
 
 
-sendRequest('GET', requestURL)
-   .then(data => console.log(data))
-   .catch(err => console.log(err))
 
-// const body = {
-//     name: 'Vladilen',
-//     age: 26
-// }
+function f1(){
+    const xhr = new XMLHttpRequest();
 
-// sendRequest('POST', requestURL, body)
-//     .then(data => console.log(data))
-//     .catch(err => console.log(err))
+    xhr.open('GET', requestURL);
+
+    xhr.onload = function(){
+        console.log(xhr.status);
+        console.log(xhr.response);
+    }
+
+    xhr.send()
+}
+//f1();
+
+function f2(){
+    const xhr = new XMLHttpRequest();
+
+    xhr.open('GET', requestUsersURL);
+    xhr.setRequestHeader('Authorization', bearerToken)
+
+    xhr.onload = function(){
+        console.log(xhr.status);
+        //console.log(xhr.response);
+        const data = JSON.parse(xhr.response);
+        const responseKeys = {
+            'id': 'userId',
+
+        }
+        console.log(data);
+        document.getElementById("statusCode").innerHTML = `StatusCode: ${xhr.status}`;
+        document.getElementById("userId").innerHTML = `User ID: ${data[0]['id']}`;
+        document.getElementById("userLogin").innerHTML = `User login: ${data[0]['login']}`;
+        document.getElementById("userName").innerHTML = `User name: ${data[0]['name']}`;
+        document.getElementById("userRoleId").innerHTML = `User role id: ${data[0]['role_id']}`;
+        document.getElementById("userStatus").innerHTML = `User status: ${data[0]['status']}`;
+    }
+
+    xhr.send();
+}
+//f2()
+
+
