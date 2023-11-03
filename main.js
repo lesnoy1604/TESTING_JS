@@ -1,49 +1,110 @@
-const counterElement = document.querySelector('#counter')
-let counter = 0
-let timerID
-
-
-const btnStart = document.querySelector('#start')
-btnStart.onclick = function () {
-    console.log('btnStart')
-    timerID = setInterval(function(){
-        counter++;
-        counterElement.innerText = counter;
-    }, 1000)
-};
-
-const btnStop = document.querySelector('#pause');
-btnStop.onclick = function (){
-    console.log('btnStop');
-    clearInterval(timerID);
-};
-
-const btnReset = document.querySelector('#reset');
-btnReset.onclick = function (){
-    console.log('btnReset');
-    counter = 0;
-    counterElement.innerText = counter;
-    clearInterval(timerID);
-};
-
-
-
-//const requestURL = 'https://swapi.dev/api/people/1/'
-
 const requestAuthURL = 'http://0.0.0.0:4040/api/v1/auth/token/'
 const requestUsersURL = 'http://0.0.0.0:4040/api/v1/users/'
-const bearerToken ='Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsInVzZXJpZCI6MSwiYWNjZXNzIjo0Mjk0OTY3Mjk1LCJleHAiOjE2OTgzMTgxMjd9.ueaZT6KMmn07z9xnBHDmg6ycXCfd0HY9MGFjCO-jgb4'
-const bodyInf = {
-    username: 'alfasatcom',
-    password: 'alfasatcom'
+const requestMyUserInf = 'http://0.0.0.0:4040/api/v1/users/me/'
+let bearerToken = ''
+//const form1 = document.getElementById('form');
+// function retrieveFormValue(event) {
+//     event.preventDefault();
+
+//     const id = form1.querySelector('[name="userIdForm"]')
+//     const role = form1.querySelector('[name="userRoleForm"]')
+//     const formValues = {
+//         id: id.value,
+//         role: role.value
+//     }
+//     console.log(formValues)
+//     return formValues
+// }
+
+//form.addEventListener('submit', retrieveFormValue);
+
+
+const auth = {
+    bearer: '',
+    isAuth: false,
 }
 
+
+
+
+const
+    saveAuthorizeResponse = (res) => {
+        console.log(res)
+        const keys = Object.keys(res)
+        console.log(keys)
+        for (const [key, value] of Object.entries(res)) {
+            localStorage.setItem(key, value);
+            console.log(key, value)
+          }
+        console.log(localStorage.getItem('access_token'))
+        auth.bearer = `Bearer ${localStorage.getItem('access_token')}`
+        return true
+    },
+
+    /**
+     * Отправка авторизации
+     * @param {string} username - логин
+     * @param {string} password - пароль
+     * @return {Promise<boolean>}
+     */
+    authorize = async (username, password) => {
+            const body = new FormData();
+            body.append("username", username);
+            body.append("password", password);
+        
+            const response = await fetch(requestAuthURL, {
+              method: 'POST',
+              body
+            });
+            if (!response) {
+                alert(`Ошибка получения ответа!`)
+                return false
+            }
+            if (response.status!==200){
+                if (response.status === 401){
+                    alert(`Ошибка авторизации!`)
+                    return false
+                }
+                alert(`Получен статус ошибки ${response.status}!`)
+                return false
+            }
+            saveAuthorizeResponse(await response.json())
+            return true
+},
+
+    /**
+     * Реакция на отправку формы
+     * @param {Event} e
+     * @param {string} username - логин
+     * @param {string} password - пароль
+     * @return {Promise<boolean>}
+     */
+    onSend = async (e, username, password) => {
+        e.preventDefault()
+        if(!password || !username) {
+            alert('А правильно ли ты ввёл?')
+            return false
+        }
+        await authorize(username, password)
+        return true
+    }
+
+/**
+ * Форма
+ */
+const form = document.forms?.formElem || null
+if(form){
+    const
+        un = form?.username,
+        pw = form?.password
+    form.addEventListener("submit", (e) => onSend(e, un.value, pw.value));
+}
 
 
 function f1(){
     const xhr = new XMLHttpRequest();
 
-    xhr.open('GET', requestURL);
+    xhr.open('GET', requestUsersURL);
 
     xhr.onload = function(){
         console.log(xhr.status);
@@ -52,17 +113,18 @@ function f1(){
 
     xhr.send()
 }
-//f1();
+
 
 function f2(){
     const xhr = new XMLHttpRequest();
 
     xhr.open('GET', requestUsersURL);
-    xhr.setRequestHeader('Authorization', bearerToken)
+    xhr.setRequestHeader('Authorization', auth.bearer);
+
 
     xhr.onload = function(){
         console.log(xhr.status);
-        //console.log(xhr.response);
+        console.log(xhr.response);
         const data = JSON.parse(xhr.response);
         const responseKeys = {
             'id': 'userId',
@@ -70,15 +132,46 @@ function f2(){
         }
         console.log(data);
         document.getElementById("statusCode").innerHTML = `StatusCode: ${xhr.status}`;
-        document.getElementById("userId").innerHTML = `User ID: ${data[0]['id']}`;
-        document.getElementById("userLogin").innerHTML = `User login: ${data[0]['login']}`;
-        document.getElementById("userName").innerHTML = `User name: ${data[0]['name']}`;
-        document.getElementById("userRoleId").innerHTML = `User role id: ${data[0]['role_id']}`;
-        document.getElementById("userStatus").innerHTML = `User status: ${data[0]['status']}`;
+        document.getElementById("userId").innerHTML = `User ID: ${data[2]['id']}`; 
+        document.getElementById("userLogin").innerHTML = `User login: ${data[2]['login']}`;
+        document.getElementById("userName").innerHTML = `User name: ${data[2]['name']}`;
+        document.getElementById("userRoleId").innerHTML = `User role id: ${data[2]['role_id']}`;
+        document.getElementById("userStatus").innerHTML = `User status: ${data[2]['status']}`;
     }
 
     xhr.send();
 }
-//f2()
+
+
+
+
+function f3(){
+    const xhr = new XMLHttpRequest();
+
+    xhr.open('GET', requestMyUserInf);
+    xhr.setRequestHeader('Authorization', auth.bearer)
+
+    xhr.onload = function(){
+        console.log(xhr.status);
+        console.log(xhr.response);
+        const data = JSON.parse(xhr.response);
+        const responseKeys = {
+            'id': 'userId',
+
+        }
+        console.log(data);
+        document.getElementById("statusCodeMyInf").innerHTML = `StatusCode: ${xhr.status}`;
+        document.getElementById("myId").innerHTML = `User ID: ${data['id']}`;
+        document.getElementById("userLoginMyInf").innerHTML = `User login: ${data['login']}`;
+        document.getElementById("userRoleIdMyInf").innerHTML = `User role: ${data['role_id']}`;
+        document.getElementById("userStatusMyInf").innerHTML = `User status: ${data['status']}`;
+        document.getElementById("userMaxSessionsMyInf").innerHTML = `User max sessions: ${data['max_sessions']}`;
+        document.getElementById("userDarkThemeMyInf").innerHTML = `User dark theme: ${data['dark_theme']}`;
+        document.getElementById("userRoleDescriptionMyInf").innerHTML = `User role description: ${data['role_description']}`;
+        document.getElementById("userRoleAccessMyInf").innerHTML = `User role access: ${data['role_access']}`;
+    }
+
+    xhr.send();
+}
 
 
